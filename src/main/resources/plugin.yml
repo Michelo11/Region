@@ -1,0 +1,4 @@
+name: region
+version: '${version}'
+main: me.michelemanna.region.Region
+api-version: '1.20'
