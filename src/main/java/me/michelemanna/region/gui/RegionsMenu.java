@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class RegionMenu {
+public class RegionsMenu {
     public static void openRegions(Player player) {
         Map<String, Region> regions = null;
 
@@ -38,7 +38,7 @@ public class RegionMenu {
                         "# # # # # # # # #"
                 )
                 .setContent(regions.values().stream()
-                        .map(region -> new RegionItem(RegionPlugin.getInstance(), region))
+                        .map(region -> new RegionsItem(RegionPlugin.getInstance(), region))
                         .collect(Collectors.toList()))
                 .addIngredient('#', new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setDisplayName(""))
                 .addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL).build();

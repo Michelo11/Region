@@ -11,11 +11,11 @@ import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.item.impl.AbstractItem;
 
-public class RegionItem extends AbstractItem {
+public class RegionsItem extends AbstractItem {
     private final RegionPlugin plugin;
     private final Region region;
 
-    public RegionItem(RegionPlugin plugin, Region region) {
+    public RegionsItem(RegionPlugin plugin, Region region) {
         this.plugin = plugin;
         this.region = region;
     }
