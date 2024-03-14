@@ -1,7 +1,9 @@
-package me.michelemanna.region.gui;
+package me.michelemanna.region.gui.items;
 
 import me.michelemanna.region.RegionPlugin;
 import me.michelemanna.region.data.Region;
+import me.michelemanna.region.gui.RegionMenu;
+import me.michelemanna.region.gui.RegionsMenu;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -28,6 +30,6 @@ public class RegionsItem extends AbstractItem {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent inventoryClickEvent) {
-        // Open the region menu
+        RegionMenu.openRegion(player, region);
     }
 }

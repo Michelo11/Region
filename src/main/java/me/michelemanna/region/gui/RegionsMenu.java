@@ -2,6 +2,7 @@ package me.michelemanna.region.gui;
 
 import me.michelemanna.region.RegionPlugin;
 import me.michelemanna.region.data.Region;
+import me.michelemanna.region.gui.items.RegionsItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import xyz.xenondevs.invui.gui.PagedGui;
@@ -21,12 +22,12 @@ public class RegionsMenu {
         try {
             regions = RegionPlugin.getInstance().getDatabase().getRegions();
         } catch (SQLException e) {
-            player.sendMessage("An error occurred while getting your homes!");
+            player.sendMessage("§cAn error occurred while getting your homes!");
             return;
         }
 
         if (regions.isEmpty()) {
-            player.sendMessage("You don't have any regions set!");
+            player.sendMessage("§cYou don't have any regions set!");
             return;
         }
 

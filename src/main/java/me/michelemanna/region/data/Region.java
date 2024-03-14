@@ -4,4 +4,4 @@ import org.bukkit.Location;
 
 import java.util.UUID;
 
-public record Region (String name, Location start, Location end, UUID owner) {}
+public record Region (int id, String name, Location start, Location end, UUID owner) {}
