@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 
 public class DatabaseManager {
     private final Connection connection;
@@ -47,34 +48,43 @@ public class DatabaseManager {
         statement.close();
     }
 
-    public Map<String, Region> getRegions() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM regions;");
+    public CompletableFuture<Map<String, Region>> getRegions() {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM regions;");
 
-        ResultSet result = statement.executeQuery();
+                ResultSet result = statement.executeQuery();
 
-        Map<String, Region> regions = new HashMap<>();
+                Map<String, Region> regions = new HashMap<>();
 
-        while (result.next()) {
-            int id = result.getInt("id");
-            String name = result.getString("name");
-            String world = result.getString("world");
-            double x = result.getDouble("x");
-            double y = result.getDouble("y");
-            double z = result.getDouble("z");
-            double x2 = result.getDouble("x2");
-            double y2 = result.getDouble("y2");
-            double z2 = result.getDouble("z2");
+                while (result.next()) {
+                    int id = result.getInt("id");
+                    String name = result.getString("name");
+                    String world = result.getString("world");
+                    double x = result.getDouble("x");
+                    double y = result.getDouble("y");
+                    double z = result.getDouble("z");
+                    double x2 = result.getDouble("x2");
+                    double y2 = result.getDouble("y2");
+                    double z2 = result.getDouble("z2");
 
-            Location start = new Location(Bukkit.getWorld(world), x, y, z);
-            Location end = new Location(Bukkit.getWorld(world), x2, y2, z2);
+                    Location start = new Location(Bukkit.getWorld(world), x, y, z);
+                    Location end = new Location(Bukkit.getWorld(world), x2, y2, z2);
 
-            regions.put(name, new Region(id, name, start, end, UUID.fromString(result.getString("player"))));
-        }
+                    regions.put(name, new Region(id, name, start, end, UUID.fromString(result.getString("player")), new ArrayList<>()));
+                }
 
-        result.close();
-        statement.close();
+                result.close();
+                statement.close();
 
-        return regions;
+                return regions;
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            return new HashMap<>();
+        }, (runnable) -> Bukkit.getScheduler().runTaskAsynchronously(RegionPlugin.getInstance(), runnable));
     }
 
     public void createRegion(Region region) {
@@ -94,6 +104,25 @@ public class DatabaseManager {
 
                 statement.executeUpdate();
                 statement.close();
+
+                RegionPlugin.getInstance().getRegionManager().getRegions().put(region.name(), region);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void deleteRegion(Region region) {
+        Bukkit.getScheduler().runTaskAsynchronously(RegionPlugin.getInstance(), () -> {
+            try {
+                PreparedStatement statement = connection.prepareStatement("DELETE FROM regions WHERE id = ?;");
+
+                statement.setInt(1, region.id());
+
+                statement.executeUpdate();
+                statement.close();
+
+                RegionPlugin.getInstance().getRegionManager().getRegions().remove(region.name());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -110,6 +139,16 @@ public class DatabaseManager {
 
                 statement.executeUpdate();
                 statement.close();
+
+                RegionPlugin.getInstance().getRegionManager().getRegions().remove(region.name());
+                RegionPlugin.getInstance().getRegionManager().getRegions().put(name, new Region(
+                        region.id(),
+                        name,
+                        region.start(),
+                        region.end(),
+                        region.owner(),
+                        region.whitelist()
+                ));
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -132,35 +171,39 @@ public class DatabaseManager {
 
                 statement.executeUpdate();
                 statement.close();
+
+                RegionPlugin.getInstance().getRegionManager().getRegions().put(region.name(), region);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         });
     }
 
-    public List<UUID> getWhitelist(Region region) {
-        try {
-            PreparedStatement statement = connection.prepareStatement("SELECT player FROM whitelist WHERE region_id = ?;");
+    public CompletableFuture<List<UUID>> getWhitelist(Region region) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                PreparedStatement statement = connection.prepareStatement("SELECT player FROM whitelist WHERE region_id = ?;");
 
-            statement.setInt(1, region.id());
+                statement.setInt(1, region.id());
 
-            ResultSet result = statement.executeQuery();
+                ResultSet result = statement.executeQuery();
 
-            List<UUID> whitelist = new ArrayList<>();
+                List<UUID> whitelist = new ArrayList<>();
 
-            while (result.next()) {
-                whitelist.add(UUID.fromString(result.getString("player")));
+                while (result.next()) {
+                    whitelist.add(UUID.fromString(result.getString("player")));
+                }
+
+                result.close();
+                statement.close();
+
+                return whitelist;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
 
-            result.close();
-            statement.close();
-
-            return whitelist;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+            return null;
+        }, (runnable) -> Bukkit.getScheduler().runTaskAsynchronously(RegionPlugin.getInstance(), runnable));
     }
 
     public void addWhitelist(Region region, Player player) {
@@ -186,6 +229,8 @@ public class DatabaseManager {
 
                 statement.executeUpdate();
                 statement.close();
+
+                region.whitelist().add(player.getUniqueId());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -202,6 +247,8 @@ public class DatabaseManager {
 
                 statement.executeUpdate();
                 statement.close();
+
+                region.whitelist().remove(player.getUniqueId());
             } catch (SQLException e) {
                 e.printStackTrace();
             }

@@ -35,7 +35,9 @@ public class WhiteListRemoveItem extends AbstractItem {
             player.sendMessage("§cYou do not have permission to use this command!");
             return;
         }
-        
+
+        player.closeInventory();
+
         Prompt prompt = new PlayerNamePrompt(RegionPlugin.getInstance()) {
             @Nullable
             @Override

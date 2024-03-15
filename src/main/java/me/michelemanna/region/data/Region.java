@@ -2,9 +2,10 @@ package me.michelemanna.region.data;
 
 import org.bukkit.Location;
 
+import java.util.List;
 import java.util.UUID;
 
-public record Region (int id, String name, Location start, Location end, UUID owner) {
+public record Region (int id, String name, Location start, Location end, UUID owner, List<UUID> whitelist) {
     public boolean contains(Location location) {
         return location.getWorld().equals(start.getWorld()) &&
                 location.getX() >= Math.min(start.getX(), end.getX()) &&

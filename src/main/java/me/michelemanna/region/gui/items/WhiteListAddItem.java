@@ -36,6 +36,8 @@ public class WhiteListAddItem extends AbstractItem {
             return;
         }
 
+        player.closeInventory();
+
         Prompt prompt = new PlayerNamePrompt(RegionPlugin.getInstance()) {
             @Nullable
             @Override

@@ -42,7 +42,8 @@ public class RedefineLocationItem extends AbstractItem {
                 region.name(),
                 plugin.getWandListener().getStartLocations().get(player),
                 plugin.getWandListener().getEndLocations().get(player),
-                player.getUniqueId()
+                player.getUniqueId(),
+                region.whitelist()
         ));
 
         player.sendMessage("§aRegion updated!");

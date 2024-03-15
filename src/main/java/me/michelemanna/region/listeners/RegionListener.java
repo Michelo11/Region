@@ -22,6 +22,7 @@ public class RegionListener implements Listener {
         }
 
         Region region = RegionPlugin.getInstance()
+            .getRegionManager()
             .getRegions()
             .values()
             .stream()
@@ -33,7 +34,8 @@ public class RegionListener implements Listener {
             return;
         }
 
-        RegionPlugin.getInstance().getDatabase().getWhitelist(region).stream()
+        region.whitelist()
+            .stream()
             .filter(uuid -> uuid.equals(event.getPlayer().getUniqueId()))
             .findFirst()
             .ifPresentOrElse(uuid -> {}, () -> {

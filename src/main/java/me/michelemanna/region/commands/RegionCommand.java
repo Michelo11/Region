@@ -1,6 +1,7 @@
 package me.michelemanna.region.commands;
 
 import me.michelemanna.region.RegionPlugin;
+import me.michelemanna.region.commands.subcommands.*;
 import me.michelemanna.region.data.Region;
 import me.michelemanna.region.gui.RegionMenu;
 import me.michelemanna.region.gui.RegionsMenu;
@@ -12,14 +13,23 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class RegionCommand implements CommandExecutor {
     private final RegionPlugin plugin;
+    private final Map<String, SubCommand> subCommands = new HashMap<>();
 
     public RegionCommand(RegionPlugin plugin) {
         this.plugin = plugin;
+        this.subCommands.put("create", new CreateCommand());
+        this.subCommands.put("delete", new DeleteCommand());
+        this.subCommands.put("wand", new WandCommand());
+        this.subCommands.put("add", new AddCommand());
+        this.subCommands.put("remove", new RemoveCommand());
+        this.subCommands.put("whitelist", new WhitelistCommand());
     }
 
     @Override
@@ -39,125 +49,22 @@ public class RegionCommand implements CommandExecutor {
             return true;
         }
 
-        switch (args[0].toLowerCase()) {
-            case "create" -> {
-                if (!player.hasPermission("region.create")) {
-                    player.sendMessage("§cYou do not have permission to use this command!");
-                    return true;
-                }
-                
-                if (args.length != 2) {
-                    player.sendMessage("§cYou need to specify a name for the region!");
-                    return true;
-                }
+        if (subCommands.containsKey(args[0].toLowerCase())) {
+            subCommands.get(args[0].toLowerCase()).execute(player, args);
+            return true;
+        }
 
-                if (plugin.getWandListener().getStartLocations().get(player) == null || plugin.getWandListener().getEndLocations().get(player) == null) {
-                    player.sendMessage("§cYou need to select the region with the wand first!");
-                    return true;
-                }
+        if (player.hasPermission("region.menu")) {
+            Region region = plugin.getRegionManager().getRegion(args[0]);
 
-                plugin.getDatabase().createRegion(new Region(
-                        -1,
-                        args[1],
-                        plugin.getWandListener().getStartLocations().get(player),
-                        plugin.getWandListener().getEndLocations().get(player),
-                        player.getUniqueId()
-                ));
-                player.sendMessage("§aRegion created!");
-            }
-            case "wand" -> {
-                ItemBuilder wand = new ItemBuilder(Material.WOODEN_AXE);
-                wand.setDisplayName("Region Wand");
-                player.getInventory().addItem(wand.get());
-                player.sendMessage("§aYou have been given the region wand!");
-            }
-            case "add" -> {
-                if (!player.hasPermission("region.add")) {
-                    player.sendMessage("§cYou do not have permission to use this command!");
-                    return true;
-                }
-                
-                if (args.length != 3) {
-                    player.sendMessage("§cYou need to specify a player to add to the region!");
-                    return true;
-                }
-
-                if (!plugin.getRegions().containsKey(args[1])) {
-                    player.sendMessage("§cThe region does not exist!");
-                    return true;
-                }
-
-                Player target = Bukkit.getPlayer(args[2]);
-
-                if (target == null) {
-                    player.sendMessage("§cThe player is not online!");
-                    return true;
-                }
-
-                plugin.getDatabase().addWhitelist(plugin.getRegions().get(args[1]), target);
-
-                player.sendMessage("§aPlayer added to the region!");
-            }
-            case "remove" -> {
-                if (!player.hasPermission("region.remove")) {
-                    player.sendMessage("§cYou do not have permission to use this command!");
-                    return true;
-                }
-
-                if (args.length != 3) {
-                    player.sendMessage("§cYou need to specify a player to remove from the region!");
-                    return true;
-                }
-
-                if (!plugin.getRegions().containsKey(args[1])) {
-                    player.sendMessage("§cThe region does not exist!");
-                    return true;
-                }
-
-                Player target = Bukkit.getPlayer(args[2]);
-
-                if (target == null) {
-                    player.sendMessage("§cThe player is not online!");
-                    return true;
-                }
-
-                plugin.getDatabase().removeWhiteList(plugin.getRegions().get(args[1]), target);
-
-                player.sendMessage("§aPlayer removed from the region!");
-            }
-            case "whitelist" -> {
-                if (!player.hasPermission("region.whitelist")) {
-                    player.sendMessage("§cYou do not have permission to use this command!");
-                    return true;
+            if (region == null) {
+                player.sendMessage("§cThe region does not exist!");
+                return true;
             }
 
-                if (args.length != 2) {
-                    player.sendMessage("§cYou need to specify a region!");
-                    return true;
-                }
-
-                if (!plugin.getRegions().containsKey(args[1])) {
-                    player.sendMessage("§cThe region does not exist!");
-                    return true;
-                }
-
-                List<UUID> list = plugin.getDatabase().getWhitelist(plugin.getRegions().get(args[1]));
-                list.stream().map(Bukkit::getOfflinePlayer).forEach(p -> player.sendMessage("§a" + p.getName()));
-            }
-            default -> {
-                if (player.hasPermission("region.menu")) {
-                    Region region = plugin.getRegions().get(args[0]);
-
-                    if (region == null) {
-                        player.sendMessage("§cThe region does not exist!");
-                        return true;
-                    }
-    
-                    RegionMenu.openRegion(player, region);
-                } else {
-                    player.sendMessage("§cYou do not have permission to use this command!");
-                }
-            }
+            RegionMenu.openRegion(player, region);
+        } else {
+            player.sendMessage("§cYou do not have permission to use this command!");
         }
 
         return true;

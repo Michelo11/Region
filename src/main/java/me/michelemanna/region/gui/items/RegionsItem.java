@@ -14,11 +14,9 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 public class RegionsItem extends AbstractItem {
-    private final RegionPlugin plugin;
     private final Region region;
 
-    public RegionsItem(RegionPlugin plugin, Region region) {
-        this.plugin = plugin;
+    public RegionsItem(Region region) {
         this.region = region;
     }
 

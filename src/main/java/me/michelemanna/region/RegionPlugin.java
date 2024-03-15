@@ -2,8 +2,10 @@ package me.michelemanna.region;
 
 import me.michelemanna.region.commands.RegionCommand;
 import me.michelemanna.region.data.Region;
+import me.michelemanna.region.listeners.RegionListener;
 import me.michelemanna.region.listeners.WandListener;
 import me.michelemanna.region.managers.DatabaseManager;
+import me.michelemanna.region.managers.RegionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -12,8 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class RegionPlugin extends JavaPlugin {
-    private final Map<String, Region> regions = new HashMap<>();
     private DatabaseManager database;
+    private RegionManager regionManager;
     private WandListener wandListener;
     private static RegionPlugin instance;
 
@@ -23,10 +25,13 @@ public final class RegionPlugin extends JavaPlugin {
         this.saveDefaultConfig();
         getCommand("region").setExecutor(new RegionCommand(this));
         Bukkit.getPluginManager().registerEvents(wandListener = new WandListener(), this);
+        Bukkit.getPluginManager().registerEvents(new RegionListener(), this);
 
         try {
             this.database = new DatabaseManager(this.getConfig().getString("database"));
-            this.regions.putAll(this.database.getRegions());
+
+            this.regionManager = new RegionManager(this);
+            this.regionManager.load();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -49,7 +54,7 @@ public final class RegionPlugin extends JavaPlugin {
         return wandListener;
     }
 
-    public Map<String, Region> getRegions() {
-        return regions;
+    public RegionManager getRegionManager() {
+        return regionManager;
     }
 }

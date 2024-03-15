@@ -16,15 +16,7 @@ import java.util.stream.Collectors;
 
 public class RegionsMenu {
     public static void openRegions(Player player) {
-        Map<String, Region> regions = null;
-
-
-        try {
-            regions = RegionPlugin.getInstance().getDatabase().getRegions();
-        } catch (SQLException e) {
-            player.sendMessage("§cAn error occurred while getting your homes!");
-            return;
-        }
+        Map<String, Region> regions = RegionPlugin.getInstance().getRegionManager().getRegions();
 
         if (regions.isEmpty()) {
             player.sendMessage("§cYou don't have any regions set!");
@@ -39,7 +31,7 @@ public class RegionsMenu {
                         "# # # # # # # # #"
                 )
                 .setContent(regions.values().stream()
-                        .map(region -> new RegionsItem(RegionPlugin.getInstance(), region))
+                        .map(region -> new RegionsItem(region))
                         .collect(Collectors.toList()))
                 .addIngredient('#', new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setDisplayName(""))
                 .addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL).build();
