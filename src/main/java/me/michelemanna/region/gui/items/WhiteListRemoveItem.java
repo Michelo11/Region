@@ -31,6 +31,11 @@ public class WhiteListRemoveItem extends AbstractItem {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent inventoryClickEvent) {
+        if (!player.hasPermission("region.remove")) {
+            player.sendMessage("§cYou do not have permission to use this command!");
+            return;
+        }
+        
         Prompt prompt = new PlayerNamePrompt(RegionPlugin.getInstance()) {
             @Nullable
             @Override

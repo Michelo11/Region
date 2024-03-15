@@ -30,12 +30,22 @@ public class RegionCommand implements CommandExecutor {
         }
 
         if (args.length == 0) {
-            RegionsMenu.openRegions(player);
+            if (player.hasPermission("region.menu")) {
+                RegionsMenu.openRegions(player);
+                return true;
+            }
+
+            player.sendMessage("§cYou do not have permission to use this command!");
             return true;
         }
 
         switch (args[0].toLowerCase()) {
             case "create" -> {
+                if (!player.hasPermission("region.create")) {
+                    player.sendMessage("§cYou do not have permission to use this command!");
+                    return true;
+                }
+                
                 if (args.length != 2) {
                     player.sendMessage("§cYou need to specify a name for the region!");
                     return true;
@@ -62,6 +72,11 @@ public class RegionCommand implements CommandExecutor {
                 player.sendMessage("§aYou have been given the region wand!");
             }
             case "add" -> {
+                if (!player.hasPermission("region.add")) {
+                    player.sendMessage("§cYou do not have permission to use this command!");
+                    return true;
+                }
+                
                 if (args.length != 3) {
                     player.sendMessage("§cYou need to specify a player to add to the region!");
                     return true;
@@ -84,6 +99,11 @@ public class RegionCommand implements CommandExecutor {
                 player.sendMessage("§aPlayer added to the region!");
             }
             case "remove" -> {
+                if (!player.hasPermission("region.remove")) {
+                    player.sendMessage("§cYou do not have permission to use this command!");
+                    return true;
+                }
+
                 if (args.length != 3) {
                     player.sendMessage("§cYou need to specify a player to remove from the region!");
                     return true;
@@ -106,6 +126,11 @@ public class RegionCommand implements CommandExecutor {
                 player.sendMessage("§aPlayer removed from the region!");
             }
             case "whitelist" -> {
+                if (!player.hasPermission("region.whitelist")) {
+                    player.sendMessage("§cYou do not have permission to use this command!");
+                    return true;
+            }
+
                 if (args.length != 2) {
                     player.sendMessage("§cYou need to specify a region!");
                     return true;
@@ -120,14 +145,18 @@ public class RegionCommand implements CommandExecutor {
                 list.stream().map(Bukkit::getOfflinePlayer).forEach(p -> player.sendMessage("§a" + p.getName()));
             }
             default -> {
-                Region region = plugin.getRegions().get(args[0]);
+                if (player.hasPermission("region.menu")) {
+                    Region region = plugin.getRegions().get(args[0]);
 
-                if (region == null) {
-                    player.sendMessage("§cThe region does not exist!");
-                    return true;
+                    if (region == null) {
+                        player.sendMessage("§cThe region does not exist!");
+                        return true;
+                    }
+    
+                    RegionMenu.openRegion(player, region);
+                } else {
+                    player.sendMessage("§cYou do not have permission to use this command!");
                 }
-
-                RegionMenu.openRegion(player, region);
             }
         }
 
