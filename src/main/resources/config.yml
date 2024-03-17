@@ -1,1 +1,8 @@
-database: ""
+# This file is used to configure the database connection
+mysql:
+  host: "localhost"
+  port: 3306
+  username: "root"
+  password: "example"
+  database: "parkour"
+  ssl: false
