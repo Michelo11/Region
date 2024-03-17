@@ -1,24 +1,42 @@
 package me.michelemanna.region.managers;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import me.michelemanna.region.RegionPlugin;
 import me.michelemanna.region.data.Region;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.sql.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class DatabaseManager {
-    private final Connection connection;
+    private final HikariDataSource dataSource;
 
-    public DatabaseManager(String url) throws SQLException {
-        connection = DriverManager.getConnection(url);
+    public DatabaseManager(RegionPlugin plugin) throws SQLException, ClassNotFoundException {
+        ConfigurationSection cs = plugin.getConfig().getConfigurationSection("mysql");
+        Objects.requireNonNull(cs, "Unable to find the following key: mysql");
+        HikariConfig config = new HikariConfig();
+
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        config.setJdbcUrl("jdbc:mysql://" + cs.getString("host") + ":" + cs.getString("port") + "/" + cs.getString("database"));
+        config.setUsername(cs.getString("username"));
+        config.setPassword(cs.getString("password"));
+        config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        config.setConnectionTimeout(10000);
+        config.setLeakDetectionThreshold(10000);
+        config.setMaximumPoolSize(10);
+        config.setMaxLifetime(60000);
+        config.setPoolName("RegionPool");
+        config.addDataSourceProperty("useSSL", cs.getBoolean("ssl"));
+
+        this.dataSource = new HikariDataSource(config);
+
+        Connection connection = dataSource.getConnection();
 
         Statement statement = connection.createStatement();
 
@@ -46,11 +64,14 @@ public class DatabaseManager {
         );
 
         statement.close();
+        connection.close();
     }
 
     public CompletableFuture<Map<String, Region>> getRegions() {
         return CompletableFuture.supplyAsync(() -> {
             try {
+                Connection connection = dataSource.getConnection();
+
                 PreparedStatement statement = connection.prepareStatement("SELECT * FROM regions;");
 
                 ResultSet result = statement.executeQuery();
@@ -76,6 +97,7 @@ public class DatabaseManager {
 
                 result.close();
                 statement.close();
+                connection.close();
 
                 return regions;
 
@@ -90,6 +112,8 @@ public class DatabaseManager {
     public void createRegion(Region region) {
         Bukkit.getScheduler().runTaskAsynchronously(RegionPlugin.getInstance(), () -> {
             try {
+                Connection connection = dataSource.getConnection();
+
                 PreparedStatement statement = connection.prepareStatement("INSERT INTO regions (player, name, world, x, y, z, x2, y2, z2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
 
                 statement.setString(1, region.owner().toString());
@@ -104,6 +128,7 @@ public class DatabaseManager {
 
                 statement.executeUpdate();
                 statement.close();
+                connection.close();
 
                 RegionPlugin.getInstance().getRegionManager().getRegions().put(region.name(), region);
             } catch (SQLException e) {
@@ -115,12 +140,15 @@ public class DatabaseManager {
     public void deleteRegion(Region region) {
         Bukkit.getScheduler().runTaskAsynchronously(RegionPlugin.getInstance(), () -> {
             try {
+                Connection connection = dataSource.getConnection();
+
                 PreparedStatement statement = connection.prepareStatement("DELETE FROM regions WHERE id = ?;");
 
                 statement.setInt(1, region.id());
 
                 statement.executeUpdate();
                 statement.close();
+                connection.close();
 
                 RegionPlugin.getInstance().getRegionManager().getRegions().remove(region.name());
             } catch (SQLException e) {
@@ -132,6 +160,8 @@ public class DatabaseManager {
     public void updateName(Region region, String name) {
         Bukkit.getScheduler().runTaskAsynchronously(RegionPlugin.getInstance(), () -> {
             try {
+                Connection connection = dataSource.getConnection();
+
                 PreparedStatement statement = connection.prepareStatement("UPDATE regions SET name = ? WHERE id = ?;");
 
                 statement.setString(1, name);
@@ -139,6 +169,7 @@ public class DatabaseManager {
 
                 statement.executeUpdate();
                 statement.close();
+                connection.close();
 
                 RegionPlugin.getInstance().getRegionManager().getRegions().remove(region.name());
                 RegionPlugin.getInstance().getRegionManager().getRegions().put(name, new Region(
@@ -158,6 +189,8 @@ public class DatabaseManager {
     public void updateLocation(Region region) {
         Bukkit.getScheduler().runTaskAsynchronously(RegionPlugin.getInstance(), () -> {
             try {
+                Connection connection = dataSource.getConnection();
+
                 PreparedStatement statement = connection.prepareStatement("UPDATE regions SET world = ?, x = ?, y = ?, z = ?, x2 = ?, y2 = ?, z2 = ? WHERE id = ?;");
 
                 statement.setString(1, region.start().getWorld().getName());
@@ -171,6 +204,7 @@ public class DatabaseManager {
 
                 statement.executeUpdate();
                 statement.close();
+                connection.close();
 
                 RegionPlugin.getInstance().getRegionManager().getRegions().put(region.name(), region);
             } catch (SQLException e) {
@@ -182,6 +216,8 @@ public class DatabaseManager {
     public CompletableFuture<List<UUID>> getWhitelist(Region region) {
         return CompletableFuture.supplyAsync(() -> {
             try {
+                Connection connection = dataSource.getConnection();
+
                 PreparedStatement statement = connection.prepareStatement("SELECT player FROM whitelist WHERE region_id = ?;");
 
                 statement.setInt(1, region.id());
@@ -196,6 +232,7 @@ public class DatabaseManager {
 
                 result.close();
                 statement.close();
+                connection.close();
 
                 return whitelist;
             } catch (SQLException e) {
@@ -209,6 +246,8 @@ public class DatabaseManager {
     public void addWhitelist(Region region, Player player) {
         Bukkit.getScheduler().runTaskAsynchronously(RegionPlugin.getInstance(), () -> {
             try {
+                Connection connection = dataSource.getConnection();
+
                 PreparedStatement statement = connection.prepareStatement("SELECT * FROM whitelist WHERE region_id = ? AND player = ?;");
 
                 statement.setInt(1, region.id());
@@ -219,6 +258,7 @@ public class DatabaseManager {
                 if (result.next()) {
                     result.close();
                     statement.close();
+                    connection.close();
                     return;
                 }
 
@@ -229,6 +269,7 @@ public class DatabaseManager {
 
                 statement.executeUpdate();
                 statement.close();
+                connection.close();
 
                 region.whitelist().add(player.getUniqueId());
             } catch (SQLException e) {
@@ -240,6 +281,8 @@ public class DatabaseManager {
     public void removeWhiteList(Region region, Player player) {
         Bukkit.getScheduler().runTaskAsynchronously(RegionPlugin.getInstance(), () -> {
             try {
+                Connection connection = dataSource.getConnection();
+
                 PreparedStatement statement = connection.prepareStatement("DELETE FROM whitelist WHERE region_id = ? AND player = ?;");
 
                 statement.setInt(1, region.id());
@@ -247,11 +290,16 @@ public class DatabaseManager {
 
                 statement.executeUpdate();
                 statement.close();
+                connection.close();
 
                 region.whitelist().remove(player.getUniqueId());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         });
+    }
+
+    public void close() {
+        dataSource.close();
     }
 }

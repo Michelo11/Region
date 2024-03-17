@@ -28,18 +28,18 @@ public final class RegionPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new RegionListener(), this);
 
         try {
-            this.database = new DatabaseManager(this.getConfig().getString("database"));
+            this.database = new DatabaseManager(this);
 
             this.regionManager = new RegionManager(this);
             this.regionManager.load();
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        this.database.close();
     }
 
     public static RegionPlugin getInstance() {

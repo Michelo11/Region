@@ -1,8 +1,10 @@
 package me.michelemanna.region.commands.subcommands;
 
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import me.michelemanna.region.commands.SubCommand;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 
 public class WandCommand implements SubCommand {
@@ -10,7 +12,12 @@ public class WandCommand implements SubCommand {
     public void execute(Player player, String[] args) {
         ItemBuilder wand = new ItemBuilder(Material.WOODEN_AXE);
         wand.setDisplayName("Region Wand");
-        player.getInventory().addItem(wand.get());
+        ItemStack item = wand.get();
+
+        NBTItem nbtItem = new NBTItem(item);
+        nbtItem.setBoolean("region_wand", true);
+
+        player.getInventory().addItem(nbtItem.getItem());
         player.sendMessage("§aYou have been given the region wand!");
     }
 }

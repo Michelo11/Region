@@ -1,5 +1,6 @@
 package me.michelemanna.region.listeners;
 
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -28,15 +29,21 @@ public class WandListener implements Listener {
             return;
         }
 
-        if (item.getType() == Material.WOODEN_AXE && item.hasItemMeta() &&
-                item.getItemMeta().hasDisplayName() &&
-                item.getItemMeta().getDisplayName().contains("Region Wand")) {
+        if (item.getType() == Material.WOODEN_AXE) {
+            NBTItem nbtItem = new NBTItem(item);
+
+            if (!nbtItem.hasTag("region_wand")) {
+                return;
+            }
+
             event.setCancelled(true);
             if (event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
                 startLocations.put(event.getPlayer(), event.getClickedBlock().getLocation());
+
                 event.getPlayer().sendMessage("§aStart location set!");
             } else if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                 endLocations.put(event.getPlayer(), event.getClickedBlock().getLocation());
+
                 event.getPlayer().sendMessage("§aEnd location set!");
             }
         }
