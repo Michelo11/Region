@@ -10,7 +10,6 @@ import xyz.xenondevs.invui.gui.structure.Markers;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.window.Window;
 
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -19,7 +18,7 @@ public class RegionsMenu {
         Map<String, Region> regions = RegionPlugin.getInstance().getRegionManager().getRegions();
 
         if (regions.isEmpty()) {
-            player.sendMessage("§cYou don't have any regions set!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("gui.no-regions"));
             return;
         }
 

@@ -23,7 +23,7 @@ public class RemovePrompt extends PlayerNamePrompt {
     protected Prompt acceptValidatedInput(@NotNull ConversationContext context, @NotNull Player input) {
         RegionPlugin.getInstance().getDatabase().removeWhiteList(region, input);
 
-        ((Player) context.getForWhom()).sendMessage("§cPlayer removed from the whitelist");
+        ((Player) context.getForWhom()).sendMessage(RegionPlugin.getInstance().getMessage("conversations.remove-success"));
 
         return null;
     }
@@ -31,6 +31,6 @@ public class RemovePrompt extends PlayerNamePrompt {
     @NotNull
     @Override
     public String getPromptText(@NotNull ConversationContext context) {
-        return "Enter the name of the player to remove from the whitelist";
+        return RegionPlugin.getInstance().getMessage("conversations.remove-prompt");
     }
 }

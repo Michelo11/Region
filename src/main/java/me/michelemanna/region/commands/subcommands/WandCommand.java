@@ -1,6 +1,7 @@
 package me.michelemanna.region.commands.subcommands;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import me.michelemanna.region.RegionPlugin;
 import me.michelemanna.region.commands.SubCommand;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,6 +19,6 @@ public class WandCommand implements SubCommand {
         nbtItem.setBoolean("region_wand", true);
 
         player.getInventory().addItem(nbtItem.getItem());
-        player.sendMessage("§aYou have been given the region wand!");
+        player.sendMessage(RegionPlugin.getInstance().getMessage("commands.wand-success"));
     }
 }

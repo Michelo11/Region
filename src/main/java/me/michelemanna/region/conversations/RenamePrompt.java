@@ -19,7 +19,7 @@ public class RenamePrompt extends StringPrompt {
     @NotNull
     @Override
     public String getPromptText(@NotNull ConversationContext context) {
-        return "Enter the new name for the region";
+        return RegionPlugin.getInstance().getMessage("conversations.rename-prompt");
     }
 
     @Nullable
@@ -31,7 +31,8 @@ public class RenamePrompt extends StringPrompt {
 
         RegionPlugin.getInstance().getDatabase().updateName(region, input);
 
-        ((Player) context.getForWhom()).sendMessage("§aRegion renamed to " + input);
+        ((Player) context.getForWhom()).sendMessage(RegionPlugin.getInstance().getMessage("conversations.rename-success")
+        .replace("%region%", input));
 
         return null;
     }

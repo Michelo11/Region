@@ -29,7 +29,7 @@ public class WhiteListAddItem extends AbstractItem {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent inventoryClickEvent) {
         if (!player.hasPermission("region.add")) {
-            player.sendMessage("§cYou do not have permission to use this command!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("gui.no-permission"));
             return;
         }
 

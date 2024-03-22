@@ -11,12 +11,12 @@ public class CreateCommand implements SubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!player.hasPermission("region.create")) {
-            player.sendMessage("§cYou do not have permission to use this command!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("commands.no-permission"));
             return;
         }
 
         if (args.length != 2) {
-            player.sendMessage("§cYou need to specify a name for the region!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("commands.create-usage"));
             return;
         }
 
@@ -27,7 +27,7 @@ public class CreateCommand implements SubCommand {
                 .getWandListener()
                 .getEndLocations()
                 .get(player) == null) {
-            player.sendMessage("§cYou need to select the region with the wand first!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("commands.create-no-wand"));
             return;
         }
 
@@ -45,6 +45,6 @@ public class CreateCommand implements SubCommand {
                 player.getUniqueId(),
                 new ArrayList<>()
         ));
-        player.sendMessage("§aRegion created!");
+        player.sendMessage(RegionPlugin.getInstance().getMessage("commands.create-success"));
     }
 }

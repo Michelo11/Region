@@ -9,24 +9,24 @@ public class DeleteCommand implements SubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!player.hasPermission("region.delete")) {
-            player.sendMessage("§cYou do not have permission to use this command!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("commands.no-permission"));
             return;
         }
 
         if (args.length != 2) {
-            player.sendMessage("§cYou need to specify a name for the region!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("commands.delete-usage"));
             return;
         }
 
         Region region = RegionPlugin.getInstance().getRegionManager().getRegion(args[1]);
 
         if (region == null) {
-            player.sendMessage("§cRegion not found!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("commands.region-not-found"));
             return;
         }
 
         RegionPlugin.getInstance().getDatabase().deleteRegion(region);
 
-        player.sendMessage("§aRegion deleted!");
+        player.sendMessage(RegionPlugin.getInstance().getMessage("commands.delete-success"));
     }
 }

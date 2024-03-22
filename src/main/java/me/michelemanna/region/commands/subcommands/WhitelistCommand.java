@@ -12,19 +12,19 @@ public class WhitelistCommand implements SubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!player.hasPermission("region.whitelist")) {
-            player.sendMessage("§cYou do not have permission to use this command!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("commands.no-permission"));
             return;
         }
 
         if (args.length != 2) {
-            player.sendMessage("§cYou need to specify a region!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("commands.whitelist-usage"));
             return;
         }
 
         if (RegionPlugin.getInstance()
                 .getRegionManager()
                 .getRegion(args[1]) == null) {
-            player.sendMessage("§cThe region does not exist!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("commands.region-not-found"));
             return;
         }
 
@@ -34,6 +34,7 @@ public class WhitelistCommand implements SubCommand {
 
         list.stream()
                 .map(Bukkit::getOfflinePlayer)
-                .forEach(p -> player.sendMessage("§a" + p.getName()));
+                .forEach(p -> player.sendMessage(RegionPlugin.getInstance().getMessage("commands.whitelist-list")
+                        .replace("%player%", p.getName())));
     }
 }

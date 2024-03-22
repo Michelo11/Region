@@ -28,12 +28,12 @@ public class RedefineLocationItem extends AbstractItem {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent inventoryClickEvent) {
         if (plugin.getWandListener().getStartLocations().get(player) == null || plugin.getWandListener().getEndLocations().get(player) == null) {
-            player.sendMessage("§cYou need to select the region with the wand first!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("gui.no-locations"));
             return;
         }
 
         if (region.start().equals(plugin.getWandListener().getStartLocations().get(player)) && region.end().equals(plugin.getWandListener().getEndLocations().get(player))) {
-            player.sendMessage("§cYou need to change the region's location!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("gui.same-locations"));
             return;
         }
 
@@ -46,6 +46,6 @@ public class RedefineLocationItem extends AbstractItem {
                 region.whitelist()
         ));
 
-        player.sendMessage("§aRegion updated!");
+        player.sendMessage(RegionPlugin.getInstance().getMessage("gui.redefined-location"));
     }
 }

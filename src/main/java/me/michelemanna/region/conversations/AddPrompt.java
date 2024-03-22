@@ -23,7 +23,7 @@ public class AddPrompt extends PlayerNamePrompt {
     protected Prompt acceptValidatedInput(@NotNull ConversationContext context, @NotNull Player input) {
         RegionPlugin.getInstance().getDatabase().addWhitelist(region, input);
 
-        ((Player) context.getForWhom()).sendMessage("§aPlayer added to the whitelist");
+        ((Player) context.getForWhom()).sendMessage(RegionPlugin.getInstance().getMessage("conversations.add-success"));
 
         return null;
     }
@@ -31,6 +31,6 @@ public class AddPrompt extends PlayerNamePrompt {
     @NotNull
     @Override
     public String getPromptText(@NotNull ConversationContext context) {
-        return "Enter the name of the player to add to the whitelist";
+        return RegionPlugin.getInstance().getMessage("conversations.add-prompt");
     }
 }

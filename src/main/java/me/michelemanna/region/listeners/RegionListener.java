@@ -40,7 +40,7 @@ public class RegionListener implements Listener {
             .findFirst()
             .ifPresentOrElse(uuid -> {}, () -> {
                 event.setCancelled(true);
-                event.getPlayer().sendMessage("§cYou do not have permission to interact with this block!");
+                event.getPlayer().sendMessage(RegionPlugin.getInstance().getMessage("listeners.no-permission"));
             });
 
     }

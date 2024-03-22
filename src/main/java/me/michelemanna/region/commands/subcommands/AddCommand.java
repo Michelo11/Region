@@ -9,24 +9,24 @@ public class AddCommand implements SubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!player.hasPermission("region.add")) {
-            player.sendMessage("§cYou do not have permission to use this command!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("commands.no-permission"));
             return;
         }
 
         if (args.length != 3) {
-            player.sendMessage("§cYou need to specify a player to add to the region!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("commands.add-usage"));
             return;
         }
 
         if (RegionPlugin.getInstance().getRegionManager().getRegion(args[1]) == null) {
-            player.sendMessage("§cThe region does not exist!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("commands.region-not-found"));
             return;
         }
 
         Player target = Bukkit.getPlayer(args[2]);
 
         if (target == null) {
-            player.sendMessage("§cThe player is not online!");
+            player.sendMessage(RegionPlugin.getInstance().getMessage("commands.player-not-found"));
             return;
         }
 
@@ -35,6 +35,6 @@ public class AddCommand implements SubCommand {
                 .addWhitelist(RegionPlugin.getInstance()
                         .getRegionManager().getRegion(args[1]), target);
 
-        player.sendMessage("§aPlayer added to the region!");
+        player.sendMessage(RegionPlugin.getInstance().getMessage("commands.add-success"));
     }
 }

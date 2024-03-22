@@ -1,6 +1,8 @@
 package me.michelemanna.region.listeners;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import me.michelemanna.region.RegionPlugin;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -40,11 +42,11 @@ public class WandListener implements Listener {
             if (event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
                 startLocations.put(event.getPlayer(), event.getClickedBlock().getLocation());
 
-                event.getPlayer().sendMessage("§aStart location set!");
+                event.getPlayer().sendMessage(RegionPlugin.getInstance().getMessage("listeners.start-location-set"));
             } else if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                 endLocations.put(event.getPlayer(), event.getClickedBlock().getLocation());
 
-                event.getPlayer().sendMessage("§aEnd location set!");
+                event.getPlayer().sendMessage(RegionPlugin.getInstance().getMessage("listeners.end-location-set"));
             }
         }
     }
