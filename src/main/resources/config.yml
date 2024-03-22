@@ -1,8 +1,45 @@
-# This file is used to configure the database connection
+# Database configuration
 mysql:
   host: "localhost"
   port: 3306
   username: "root"
   password: "example"
-  database: "parkour"
+  database: "regions"
   ssl: false
+
+# Messages configuration
+messages:
+  commands:
+    player-only: "&cOnly players can execute this command."
+    no-permission: "&cYou do not have permission to execute this command."
+    add-usage: "&cUsage: /region add <player>"
+    region-not-found: "&cThe region was not found."
+    player-not-found: "&cThe player was not found."
+    add-success: "&aThe region has been added successfully."
+    create-usage: "&cUsage: /region create <name>"
+    create-no-wand: "&cYou must have a wand to create a region."
+    create-success: "&aThe region has been created successfully."
+    delete-usage: "&cUsage: /region delete <name>"
+    delete-success: "&aThe region has been deleted successfully."
+    remove-usage: "&cUsage: /region remove <player>"
+    remove-success: "&aThe player has been removed successfully."
+    wand-usage: "&cUsage: /region wand <player>"
+    wand-success: "&aYou have received the wand."
+    whitelist-usage: "&cUsage: /region whitelist <region>"
+    whitelist-list: "&aWhitelisted players: %players%"
+  conversations:
+    add-prompt: "&aPlease enter the name of the player you want to add to the region."
+    add-success: "&aThe player has been added successfully."
+    remove-prompt: "&aPlease enter the name of the player you want to remove from the region."
+    remove-success: "&aThe player has been removed successfully."
+    rename-prompt: "&aPlease enter the new name of the region."
+    rename-success: "&aThe region has been renamed successfully."
+  gui:
+    no-regions: "&cYou do not have any regions."
+    no-location: "&cYou must select two locations."
+    same-location: "&cThe locations must be different."
+    no-permission: "&cYou do not have permission to use this item."
+  listeners:
+    no-permission: "&cYou do not have permission to interact with this region."
+    start-location-set: "&aThe start location has been set."
+    end-location-set: "&aThe end location has been set."

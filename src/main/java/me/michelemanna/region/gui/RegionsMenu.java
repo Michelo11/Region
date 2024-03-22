@@ -30,7 +30,7 @@ public class RegionsMenu {
                         "# # # # # # # # #"
                 )
                 .setContent(regions.values().stream()
-                        .map(region -> new RegionsItem(region))
+                        .map(RegionsItem::new)
                         .collect(Collectors.toList()))
                 .addIngredient('#', new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setDisplayName(""))
                 .addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL).build();
