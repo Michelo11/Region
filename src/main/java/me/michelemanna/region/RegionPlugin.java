@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.ChatColor;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 public final class RegionPlugin extends JavaPlugin {
@@ -30,14 +31,18 @@ public final class RegionPlugin extends JavaPlugin {
 
             this.regionManager = new RegionManager(this);
             this.regionManager.load();
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException | ClassNotFoundException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public void onDisable() {
-        this.database.close();
+        try {
+            this.database.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getMessage(String path) {
