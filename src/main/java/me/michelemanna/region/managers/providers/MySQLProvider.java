@@ -63,6 +63,16 @@ public class MySQLProvider implements DatabaseProvider {
                         ")"
         );
 
+        if (cs.getInt("version", 0) == 0) {
+            statement.execute(
+                    "ALTER TABLE regions ADD COLUMN flags TEXT NOT NULL DEFAULT '{}'"
+            );
+
+            cs.set("version", 1);
+
+            RegionPlugin.getInstance().saveConfig();
+        }
+
         statement.close();
         connection.close();
     }

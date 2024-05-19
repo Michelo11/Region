@@ -28,6 +28,7 @@ messages:
     wand-success: "&aYou have received the wand."
     whitelist-usage: "&cUsage: /region whitelist <region>"
     whitelist-list: "&aWhitelisted players: %players%"
+    flags-usage: "&cUsage: /region flags <region>"
   conversations:
     add-prompt: "&aPlease enter the name of the player you want to add to the region."
     add-success: "&aThe player has been added successfully."
@@ -40,6 +41,7 @@ messages:
     no-location: "&cYou must select two locations."
     same-location: "&cThe locations must be different."
     no-permission: "&cYou do not have permission to use this item."
+    current-flag: "&aCurrent state: %state%"
   listeners:
     no-permission: "&cYou do not have permission to interact with this region."
     start-location-set: "&aThe start location has been set."

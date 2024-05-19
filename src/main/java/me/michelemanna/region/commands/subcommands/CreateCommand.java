@@ -6,6 +6,7 @@ import me.michelemanna.region.data.Region;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class CreateCommand implements SubCommand {
     @Override
@@ -43,7 +44,8 @@ public class CreateCommand implements SubCommand {
                         .getEndLocations()
                         .get(player),
                 player.getUniqueId(),
-                new ArrayList<>()
+                new ArrayList<>(),
+                new HashMap<>()
         ));
         player.sendMessage(RegionPlugin.getInstance().getMessage("commands.create-success"));
     }

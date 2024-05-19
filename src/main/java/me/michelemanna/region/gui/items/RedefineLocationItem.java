@@ -43,7 +43,8 @@ public class RedefineLocationItem extends AbstractItem {
                 plugin.getWandListener().getStartLocations().get(player),
                 plugin.getWandListener().getEndLocations().get(player),
                 player.getUniqueId(),
-                region.whitelist()
+                region.whitelist(),
+                region.flags()
         ));
 
         player.sendMessage(RegionPlugin.getInstance().getMessage("gui.redefined-location"));

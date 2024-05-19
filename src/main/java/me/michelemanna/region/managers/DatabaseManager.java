@@ -1,8 +1,11 @@
 package me.michelemanna.region.managers;
 
+import com.google.gson.Gson;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import me.michelemanna.region.RegionPlugin;
+import me.michelemanna.region.data.Flag;
+import me.michelemanna.region.data.FlagState;
 import me.michelemanna.region.data.Region;
 import me.michelemanna.region.managers.providers.DatabaseProvider;
 import me.michelemanna.region.managers.providers.MySQLProvider;
@@ -19,6 +22,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class DatabaseManager {
     private final DatabaseProvider provider;
+    private final Gson gson = new Gson();
 
     public DatabaseManager(RegionPlugin plugin) throws SQLException, ClassNotFoundException, IOException {
         ConfigurationSection cs = RegionPlugin.getInstance()
@@ -57,8 +61,9 @@ public class DatabaseManager {
 
                     Location start = new Location(Bukkit.getWorld(world), x, y, z);
                     Location end = new Location(Bukkit.getWorld(world), x2, y2, z2);
+                    Map<Flag, FlagState> flags = gson.fromJson(result.getString("flags"), new HashMap<Flag, FlagState>().getClass());
 
-                    regions.put(name, new Region(id, name, start, end, UUID.fromString(result.getString("player")), new ArrayList<>()));
+                    regions.put(name, new Region(id, name, start, end, UUID.fromString(result.getString("player")), new ArrayList<>(), flags));
                 }
 
                 result.close();
@@ -144,7 +149,8 @@ public class DatabaseManager {
                         region.start(),
                         region.end(),
                         region.owner(),
-                        region.whitelist()
+                        region.whitelist(),
+                        region.flags()
                 ));
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -167,6 +173,29 @@ public class DatabaseManager {
                 statement.setDouble(6, region.end().getY());
                 statement.setDouble(7, region.end().getZ());
                 statement.setInt(8, region.id());
+
+                statement.executeUpdate();
+                statement.close();
+                provider.closeConnection(connection);
+
+                RegionPlugin.getInstance().getRegionManager().getRegions().put(region.name(), region);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void updateFlag(Region region, Flag flag, FlagState state) {
+        Bukkit.getScheduler().runTaskAsynchronously(RegionPlugin.getInstance(), () -> {
+            try {
+                Connection connection = provider.getConnection();
+
+                PreparedStatement statement = connection.prepareStatement("UPDATE regions SET flags = ? WHERE id = ?;");
+
+                region.flags().put(flag, state);
+
+                statement.setString(1, gson.toJson(region.flags()));
+                statement.setInt(2, region.id());
 
                 statement.executeUpdate();
                 statement.close();

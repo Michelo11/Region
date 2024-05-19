@@ -49,6 +49,16 @@ public class SQLiteProvider implements DatabaseProvider {
                         ")"
         );
 
+        if (RegionPlugin.getInstance().getConfig().getInt("mysql.version", 0) == 0) {
+            statement.execute(
+                    "ALTER TABLE regions ADD COLUMN flags TEXT NOT NULL DEFAULT '{}'"
+            );
+
+            RegionPlugin.getInstance().getConfig().set("mysql.version", 1);
+
+            RegionPlugin.getInstance().saveConfig();
+        }
+
         statement.close();
     }
 

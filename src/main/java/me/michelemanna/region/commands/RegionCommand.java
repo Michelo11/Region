@@ -25,6 +25,7 @@ public class RegionCommand implements CommandExecutor {
         this.subCommands.put("add", new AddCommand());
         this.subCommands.put("remove", new RemoveCommand());
         this.subCommands.put("whitelist", new WhitelistCommand());
+        this.subCommands.put("flags", new FlagsCommand());
     }
 
     @Override
